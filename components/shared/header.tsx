@@ -1,31 +1,56 @@
-// "use client";
+"use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
-import 
- LogOutButton  from "./LogOutButton";
-import { getUser } from "@/app/utils/supabase/server";
-import { User } from "@supabase/supabase-js";
+import LogOutButton from "./LogOutButton";
+import { createClient } from "@/utils/supabase/client";
+import { User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
-export default async function Header() {
-  const user = await getUser();
-  // const [isOpen, setIsOpen] = useState(false);
-  // const [user, setUser] = useState<User| null>(null);
+type HeaderProps = {
+  initialUser?: User | null;
+};
 
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     const response:User|null = await getUser();
-  //     setUser(response);
-  //   };
-
-  //   fetchUser();
-  // }, []);
-  // const toggleMenu = () => {
-  //   setIsOpen(!isOpen);
-  // };
+export default function Header({ initialUser = null }: HeaderProps) {
+  const [user, setUser] = useState<User | null>(initialUser);
+  const router = useRouter();
+  
+  useEffect(() => {
+    // Create a supabase client
+    const supabase = createClient();
+    
+    // Check current auth state on mount
+    const checkUser = async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      setUser(currentUser);
+    };
+    
+    checkUser();
+    
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log("Auth event:", event);
+        
+        // Update local state
+        setUser(session?.user || null);
+        
+        // Force a router refresh on auth events to update server components
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          router.refresh();
+        }
+      }
+    );
+    
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
   return (
     <header className="border-b fixed top-0 w-full backdrop-blur-2xl z-10">
@@ -58,20 +83,18 @@ export default async function Header() {
         <div className="hidden md:flex items-center space-x-4">
           {user ? (
             <>
-              <LogOutButton />
+              <LogOutButton onLogout={() => setUser(null)} />
             </>
           ) : (
             <>
               <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white" asChild>
-              <Link href="/login" className="hidden sm:block">Log In</Link>
+                <Link href="/login" className="hidden sm:block">Log In</Link>
               </Button>
               <Button className="bg-yellow-400 text-black hover:bg-yellow-500" asChild>
-              <Link href="/sign-up">Sign Up</Link>
+                <Link href="/sign-up">Sign Up</Link>
               </Button>
             </>
-          )
-          }
-
+          )}
         </div>
 
         {/* Mobile Navigation */}
@@ -108,13 +131,22 @@ export default async function Header() {
                 </Link>
               </nav>
               <div className="mt-auto pt-6 flex flex-col space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full border-black text-black hover:bg-black hover:text-white"
-                >
-                  Log In
-                </Button>
-                <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500">Sign Up</Button>
+                {user ? (
+                  <LogOutButton onLogout={() => setUser(null)} />
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full border-black text-black hover:bg-black hover:text-white"
+                      asChild
+                    >
+                      <Link href="/login">Log In</Link>
+                    </Button>
+                    <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500" asChild>
+                      <Link href="/sign-up">Sign Up</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>

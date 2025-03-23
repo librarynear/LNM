@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/shared/header";
 import Footer from "@/components/shared/footer";
 import { Toaster } from "@/components/ui/sonner"
+import { getUser } from "@/utils/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,17 +21,18 @@ export const metadata: Metadata = {
   description: "Find the nearest library",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialUser = await getUser();
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header/>
+        <Header initialUser={initialUser}/>
         <div className="min-h-screen">
         {children}
         <Toaster />

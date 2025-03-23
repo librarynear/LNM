@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id            String   @id @default(uuid())
+  username      String?   @unique
+  email         String   @unique
+  password      String?  // Optional for Google authentication
+  profileCompleted Boolean @default(false) // Track if the profile is complete
+  createdAt     DateTime @default(now())
+}
+
+model Librarian {
+  id             String   @id @default(uuid())
+  username       String?   @unique
+  email          String   @unique
+  password       String?  // Optional for Google authentication
+  profileCompleted Boolean @default(false) // Track if the profile is complete
+  createdAt      DateTime @default(now())
+  
+  libraries      Library[] 
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Library {
+  id         String    @id @default(uuid())
+  name       String
+  address    String
+  location   String
+  photos     String[]  // Array of photo URLs
+  totalSeats Int
+  opensAt    String    // Opening time (e.g., "08:00 AM")
+  closesAt   String    // Closing time (e.g., "10:00 PM")
+  createdAt  DateTime  @default(now())
+
+  librarianId String
+  librarian   Librarian @relation(fields: [librarianId], references: [id], onDelete: Cascade)
+}

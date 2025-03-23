@@ -8,7 +8,8 @@ import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { loginAction, signUpAction } from "@/actions/auth";
+import { loginAction, signInWithGoogle, signUpAction } from "@/actions/auth";
+import SignInWithGoogleButton from "./SignInWithGoogleButton";
 
 interface AuthFormProps {
   type: "login" | "signUp";
@@ -26,12 +27,15 @@ function AuthForm({ type, userType }: AuthFormProps) {
       const password = formData.get("password") as string;
 
       let errorMessage;
+      
       if (isLoginForm) {
         // Handle login
         errorMessage = (await loginAction(email, password)).errorMessage;
       } else {
         // Handle signup
-        errorMessage = (await signUpAction(email, password)).errorMessage;
+        // Admin needs an additional username, so we handle that separately.
+        const username = userType === "admin" ? (formData.get("username") as string) : undefined;
+        errorMessage = (await signUpAction(email, userType, password, username)).errorMessage;
       }
 
       // Show error toast if there's an error
@@ -69,7 +73,25 @@ function AuthForm({ type, userType }: AuthFormProps) {
             disabled={isPending}
           />
         </div>
+
+        {/* Only show the username field for admin */}
+        {userType === "admin" && (
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              name="username"
+              placeholder="Enter your username"
+              type="text"
+              required
+              disabled={isPending}
+            />
+          </div>
+        )}
       </CardContent>
+      {(userType === "student" || userType === "librarian") &&(type == "login")&& (
+          <SignInWithGoogleButton />
+        )}
       <CardFooter className="mt-4 flex flex-col gap-6">
         <Button className="w-full">
           {isPending ? (

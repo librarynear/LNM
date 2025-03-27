@@ -33,9 +33,8 @@ function AuthForm({ type, userType }: AuthFormProps) {
         errorMessage = (await loginAction(email, password)).errorMessage;
       } else {
         // Handle signup
-        // Admin needs an additional username, so we handle that separately.
-        const username = userType === "admin" ? (formData.get("username") as string) : undefined;
-        errorMessage = (await signUpAction(email, userType, password, username)).errorMessage;
+        const username = ((userType === "admin") ||(userType= "librarian")) ? (formData.get("username") as string) : undefined;
+        errorMessage = (await signUpAction(email, userType, password, username,)).errorMessage;
       }
 
       // Show error toast if there's an error
@@ -43,7 +42,9 @@ function AuthForm({ type, userType }: AuthFormProps) {
         toast(errorMessage);
       } else {
         router.push(`/`);
-        toast("Success");
+        if(isLoginForm) toast("Welcome back!");
+        else
+        toast("Confirmation email sent. Please verify your email address to continue.");
       }
     });
   };
@@ -51,6 +52,19 @@ function AuthForm({ type, userType }: AuthFormProps) {
   return (
     <form action={handleSubmit}>
       <CardContent className="grid w-full items-center gap-4">
+      {(userType === "admin" || userType === "librarian") && (type === "signUp") && (
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              name="username"
+              placeholder="Enter your username"
+              type="text"
+              required
+              disabled={isPending}
+            />
+          </div>
+        )}
         <div className="flex flex-col space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -74,25 +88,12 @@ function AuthForm({ type, userType }: AuthFormProps) {
           />
         </div>
 
-        {/* Only show the username field for admin */}
-        {userType === "admin" && (
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              name="username"
-              placeholder="Enter your username"
-              type="text"
-              required
-              disabled={isPending}
-            />
-          </div>
-        )}
       </CardContent>
+      
+      <CardFooter className="mt-4 flex flex-col gap-6">
       {(userType === "student" || userType === "librarian") &&(type == "login")&& (
           <SignInWithGoogleButton />
         )}
-      <CardFooter className="mt-4 flex flex-col gap-6">
         <Button className="w-full">
           {isPending ? (
             <Loader2 className="animate-spin" />

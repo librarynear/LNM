@@ -23,16 +23,17 @@ export const signUpAction = async (
   email: string,
   role: 'student' | 'librarian' | 'admin',
   password?: string,
-  username?: string
+  username?: string,
+  provider?: string
 ) => {
   try {
     const { auth } = await createClient();
     const prisma = new PrismaClient();
 
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'librarian') {
       // Admin requires email, password, and username
-      if (!password || !username) {
-        throw new Error("Admin must provide email, password, and username");
+      if (!password || !username || !email) {
+        throw new Error(`${role} must provide email, password, and username`);
       }
 
       // Sign up with email and password (Admin only)
@@ -46,6 +47,7 @@ export const signUpAction = async (
       if (!userId) throw new Error("Error signing up");
 
       // Create Admin in DB
+      if(role === 'admin')
       await prisma.admin.create({
         data: {
           id: userId,
@@ -54,8 +56,20 @@ export const signUpAction = async (
           password,
         },
       });
+      else if(role === 'librarian') {
+        await prisma.librarian.create({
+          data: {
+            id: userId,
+            email,
+            username,
+            password,
+            provider : "email"
+          },
+        });
+      }
 
-    } else if (role === 'student' || role === 'librarian') {
+    } 
+    else if (role === 'student') {
       // Email/password sign-up flow for Student/Librarian
       if (!password) {
         throw new Error("Password is required for manual sign-up");
@@ -71,27 +85,15 @@ export const signUpAction = async (
       if (!userId) throw new Error("Error signing up");
 
       // Create Student/Librarian in DB with password
-      if (role === 'student') {
+      
         await prisma.student.create({
           data: {
             id: userId,
             email,
             password,
-            username,
           },
         });
-      } else {
-        await prisma.librarian.create({
-          data: {
-            id: userId,
-            email,
-            password,
-            username,
-          },
-        });
-      }
     }
-
     await prisma.$disconnect();
     return { errorMessage: null };
   } catch (error) {

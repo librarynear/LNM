@@ -1,12 +1,37 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/utils/supabase/middleware';
+import { getUser, createClient } from '@/utils/supabase/server';
 
 export async function middleware(request: NextRequest) {
-  // Update the session without restricting access
-  await updateSession(request);
-  return NextResponse.next(); // Allow all requests to proceed
+  // Update session to keep auth state in sync
+  const supabaseResponse = await updateSession(request);
+
+  // Get the current user
+  const user = await getUser();
+  if (!user) return supabaseResponse; // No user, let updateSession handle the redirection
+
+  // Check if the user is a librarian and profile completion status
+  const supabase = await createClient();
+  const { data: librarian, error } = await supabase
+    .from('Librarian')
+    .select('profileCompleted')
+    .eq('email', user.email) // Assuming email is unique across tables
+    .single();
+
+  if (error) {
+    console.error('Error fetching librarian profile:', error);
+    return supabaseResponse;
+  }
+
+  // Redirect librarian to onboarding if profile is incomplete
+  if (librarian && !librarian.profileCompleted && request.nextUrl.pathname !== '/onboarding') {
+    return NextResponse.redirect(new URL('/onboarding', request.url));
+  }
+
+  return supabaseResponse;
 }
 
+// Exclude API routes and static assets from middleware
 export const config = {
-  matcher: '/:path*', // Match all routes without restrictions
+  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)',
 };

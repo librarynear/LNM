@@ -81,9 +81,14 @@ export default function Header({ initialUser = null }: HeaderProps) {
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
+          {user && user.role=== "librarian" && (
+            <Link href="/add-library" className="text-sm font-medium hover:text-yellow-500 transition-colors">
+              Add Library
+              </Link>
+              )}
           {user ? (
             <>
-              <LogOutButton onLogout={() => setUser(null)} />
+              <LogOutButton onLogout={() => setUser(null)}  />
             </>
           ) : (
             <>

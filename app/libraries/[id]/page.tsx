@@ -4,7 +4,7 @@ import { ChevronLeft, MapPin, Clock, Star, Bookmark, Share2 } from "lucide-react
 
 import { Button } from "@/components/ui/button"
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+// import { Badge } from "@/components/ui/badge"
 // import LibraryReviews from "@/components/library-reviews"
 // import LibraryServices from "@/components/library-services"
 // import LibraryGallery from "@/components/library-gallery"

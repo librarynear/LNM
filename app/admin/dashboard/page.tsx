@@ -18,8 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Phone, Edit, Trash, ExternalLink } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Check, Phone, Edit } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 // Define the Library type
@@ -56,9 +55,9 @@ export default function AdminDashboard() {
       }
 
       setLibraries(data || []);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching libraries:", err);
-      setError(err.message || "Failed to load libraries");
+      setError(err instanceof Error ? err.message : "Failed to load libraries");
     } finally {
       setLoading(false);
     }
@@ -78,9 +77,9 @@ export default function AdminDashboard() {
 
       // Remove the approved library from the list
       setLibraries(libraries.filter(lib => lib.id !== libraryId));
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error approving library:", err);
-      alert("Failed to approve library: " + err.message);
+      alert("Failed to approve library: " + (err instanceof Error ? err.message : "Unknown error"));
     }
   };
 
@@ -169,12 +168,8 @@ export default function AdminDashboard() {
                             />
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">
-                          {library.libraryName}
-                        </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {library.address}
-                        </TableCell>
+                        <TableCell className="font-medium">{library.libraryName}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">{library.address}</TableCell>
                         <TableCell>
                           <a
                             href={`https://wa.me/${library.whatsappNumber}`}
@@ -189,15 +184,6 @@ export default function AdminDashboard() {
                         <TableCell>${library.feePerHour}/hr</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
-                              onClick={() => window.location.href = `/admin/edit-library/${library.id}`}
-                            >
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
                             <Button
                               variant="outline"
                               size="sm"
@@ -218,13 +204,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t py-4">
-        <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
-          &copy; {new Date().getFullYear()} Library Admin System. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 }

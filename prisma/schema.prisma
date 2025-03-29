@@ -41,16 +41,28 @@ model Admin {
 }
 
 model Library {
-  id         String    @id @default(uuid())
-  name       String
-  address    String
-  location   String
-  photos     String[]  // Array of photo URLs
-  totalSeats Int
-  opensAt    String    // Opening time (e.g., "08:00 AM")
-  closesAt   String    // Closing time (e.g., "10:00 PM")
-  createdAt  DateTime  @default(now())
+  id              String    @id @default(uuid())
+  libraryName     String
+  address         String
+  city            String
+  state           String
+  pincode         Int
+  googleMapLink   String?   // Optional field for Google Maps link
 
-  librarianId String
-  librarian   Librarian @relation(fields: [librarianId], references: [id], onDelete: Cascade)
+  photos          String[]  // Array of photo URLs
+  totalSeats      Int
+  openingTime     String    // Opening time (e.g., "08:00 AM")
+  closingTime     String    // Closing time (e.g., "10:00 PM")
+  
+  // New fields
+  whatsappNumber  String?   // Optional WhatsApp contact number
+  feePerHour      Float     // Fee for hours per day
+  feePerMonth     Float     // Fee per month
+
+  facilities     String[]
+  review_status  Boolean @default(false) // Track if the library is reviewed
+
+  createdAt       DateTime  @default(now())
+  librarianId     String
+  librarian       Librarian @relation(fields: [librarianId], references: [id], onDelete: Cascade)
 }

@@ -10,6 +10,7 @@ import LogOutButton from "./LogOutButton";
 import { createClient } from "@/utils/supabase/client";
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { getUserType, UserType } from "@/utils/supabase/getUserType";
 
 type HeaderProps = {
   initialUser?: User | null;
@@ -17,6 +18,7 @@ type HeaderProps = {
 
 export default function Header({ initialUser = null }: HeaderProps) {
   const [user, setUser] = useState<User | null>(initialUser);
+  const [usertype, setUserType] = useState<UserType>(null);
   const router = useRouter();
   
   useEffect(() => {
@@ -26,6 +28,8 @@ export default function Header({ initialUser = null }: HeaderProps) {
     // Check current auth state on mount
     const checkUser = async () => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const {type} = await getUserType();
+      setUserType(type);
       setUser(currentUser);
     };
     
@@ -33,9 +37,7 @@ export default function Header({ initialUser = null }: HeaderProps) {
     
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log("Auth event:", event);
-        
+      (event, session) => {  
         // Update local state
         setUser(session?.user || null);
         
@@ -81,11 +83,16 @@ export default function Header({ initialUser = null }: HeaderProps) {
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
-          {user && user.role=== "librarian" && (
-            <Link href="/add-library" className="text-sm font-medium hover:text-yellow-500 transition-colors">
+          {usertype === "librarian" && (
+            <Link href="/add-library" className="text-sm font-medium hover:text-yellow-500 transition-colors mr-10">
               Add Library
               </Link>
               )}
+            {usertype === "admin" && (
+            <Link href="/admin/dashboard" className="text-sm font-medium hover:text-yellow-500 transition-colors mr-10">
+              Admin Dashboard
+              </Link>
+            )}
           {user ? (
             <>
               <LogOutButton onLogout={() => setUser(null)}  />

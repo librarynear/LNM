@@ -9,6 +9,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation'; // Update import
 import { librarianSchema } from '@/zod/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 
 interface FormData {
   username: string;
@@ -143,7 +144,7 @@ export default function LibrarianOnboarding({user}:{user : {
         console.error('Profile Update Error:', updateError);
         throw updateError;
       }
-  
+      toast.success('Onboarding completed successfully!');
       router.push('/');
     } catch (err) {
       // Handle Zod validation errors

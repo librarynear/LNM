@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Phone, Edit } from "lucide-react";
+import { Check, Phone } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 // Define the Library type
@@ -55,9 +55,15 @@ export default function AdminDashboard() {
       }
 
       setLibraries(data || []);
-    } catch (err) {
-      console.error("Error fetching libraries:", err);
-      setError(err instanceof Error ? err.message : "Failed to load libraries");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Error approving library:", err.message);
+        alert("Failed to approve library: " + err.message);
+      setError(err.message || "Failed to load libraries");}
+      else {
+        console.error("Unexpected error:", err);
+        alert("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }

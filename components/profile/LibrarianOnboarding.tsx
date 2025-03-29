@@ -3,7 +3,7 @@ import React, { useState, useRef, ChangeEvent, FormEvent, JSX } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Loader2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation'; // Update import
@@ -74,7 +74,7 @@ export default function LibrarianOnboarding({user}:{user : {
       const filePath = `librarians/${fileName}`;
   
       // Perform the upload
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('librarian-profilephoto')
         .upload(filePath, file, { 
           upsert: true,

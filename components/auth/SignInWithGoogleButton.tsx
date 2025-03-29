@@ -10,7 +10,7 @@ const SignInWithGoogleButton = () => {
       const supabase = createClient();
       console.log("Reached 2");
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,

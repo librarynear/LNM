@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { loginAction, signInWithGoogle, signUpAction } from "@/actions/auth";
+import { loginAction, signUpAction } from "@/actions/auth";
 import SignInWithGoogleButton from "./SignInWithGoogleButton";
 
 interface AuthFormProps {

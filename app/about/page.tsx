@@ -136,7 +136,7 @@ export default function AboutPage() {
             <div className="rounded-lg bg-gray-100 p-6">
               <h3 className="mb-3 text-xl font-bold">Community</h3>
               <p className="text-gray-800">
-                Libraries are community hubs, and we're committed to strengthening these vital connections.
+                Libraries are community hubs, and we&apos;re committed to strengthening these vital connections.
               </p>
             </div>
           </div>

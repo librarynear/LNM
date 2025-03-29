@@ -50,7 +50,7 @@ export default function LibraryDetailsPage() {
     feePerMonth: string;
   }
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<FormData_library | null>(null);
+  // const [formData, setFormData] = useState<FormData_library | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [isFacilitiesOpen, setIsFacilitiesOpen] = useState(false);
@@ -90,7 +90,7 @@ export default function LibraryDetailsPage() {
       const filePath = `librarians/${fileName}`;
 
       // Perform the upload
-      const { data, error } = await supabase.storage
+      const {  error } = await supabase.storage
         .from('library-photos')
         .upload(filePath, file, {
           upsert: true,

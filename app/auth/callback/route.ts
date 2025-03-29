@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient();
-    const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+    const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (sessionError) {
       console.error("Error exchanging code:", sessionError.message);

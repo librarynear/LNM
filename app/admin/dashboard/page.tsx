@@ -18,8 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Phone, Edit, Trash, ExternalLink } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Check, Phone, Edit } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 // Define the Library type

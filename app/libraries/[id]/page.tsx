@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ChevronLeft, MapPin, Clock, Star, Bookmark, Share2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { createClient, getUser } from "@/utils/supabase/server"
+import { createClient } from "@/utils/supabase/server"
 import { Library } from "@prisma/client"
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 // import { Badge } from "@/components/ui/badge"

@@ -55,9 +55,15 @@ export default function AdminDashboard() {
       }
 
       setLibraries(data || []);
-    } catch (err: any) {
-      console.error("Error fetching libraries:", err);
-      setError(err.message || "Failed to load libraries");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Error approving library:", err.message);
+        alert("Failed to approve library: " + err.message);
+      setError(err.message || "Failed to load libraries");}
+      else {
+        console.error("Unexpected error:", err);
+        alert("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }

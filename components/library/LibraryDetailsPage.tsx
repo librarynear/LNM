@@ -35,20 +35,20 @@ export default function LibraryDetailsPage() {
     feePerHour: '',
     feePerMonth: ''
   });
-  interface FormData_library {
-    libraryName: string;
-    address: string;
-    city: string;
-    state: string;
-    pincode: string;
-    googleMapLink: string;
-    totalSeats: string;
-    openingTime: string;
-    closingTime: string;
-    whatsappNumber: string;
-    feePerHour: string;
-    feePerMonth: string;
-  }
+  // interface FormData_library {
+  //   libraryName: string;
+  //   address: string;
+  //   city: string;
+  //   state: string;
+  //   pincode: string;
+  //   googleMapLink: string;
+  //   totalSeats: string;
+  //   openingTime: string;
+  //   closingTime: string;
+  //   whatsappNumber: string;
+  //   feePerHour: string;
+  //   feePerMonth: string;
+  // }
   const [loading, setLoading] = useState(false);
   // const [formData, setFormData] = useState<FormData_library | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);

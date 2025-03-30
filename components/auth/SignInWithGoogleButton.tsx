@@ -6,14 +6,15 @@ import React from "react";
 const SignInWithGoogleButton = () => {
   const handleSignIn = async () => {
     try {
-      console.log("Reached 1");
       const supabase = createClient();
-      console.log("Reached 2");
+      
+      // This will use the current URL (localhost, Netlify, or Vercel)
+      const redirectTo = `${window.location.origin}/auth/callback`;
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectTo,
           queryParams: {
             access_type: "offline",
             prompt: "consent",
@@ -21,12 +22,10 @@ const SignInWithGoogleButton = () => {
         },
       });
       
-      console.log("Reached 3");
       if (error) {
         console.error("OAuth error:", error);
         return;
       }
-      console.log("Reached 4");
     } catch (err) {
       console.error("SignIn error:", err);
     }

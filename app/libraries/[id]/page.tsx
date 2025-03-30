@@ -67,9 +67,11 @@ const getLibraryData = async(id: string) => {
   //   amenities: ["Free Wi-Fi", "Wheelchair Accessible", "Parking", "Café", "Restrooms", "Meeting Rooms"],
   // }
 }
-
-export default async function LibraryPage({ params }: { params: { id: string } }) {
-  const library:Library = await getLibraryData(params.id)
+type tParams = Promise<{ slug: string[] }>;
+export default async function LibraryPage(props: { params: tParams }) {
+  const { slug } = await props.params;
+   const id = slug[1];
+   const library:Library = await getLibraryData(id)
 
   return (
     <main className="min-h-screen pb-16">

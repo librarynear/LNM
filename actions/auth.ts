@@ -134,12 +134,10 @@ export async function signInWithGoogle() {
         },
       },
     });
-    console.log("Reached 4");
     if (error) {
       console.error("OAuth error:", error);
       return;
     }
-    console.log("Reached 5");
     return data;
   } catch (err) {
     console.error("SignIn error:", err);

@@ -1,10 +1,11 @@
+"use server"
 import Image from "next/image"
 import Link from "next/link"
 import { ChevronLeft, MapPin, Clock, Star, Bookmark, Share2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/utils/supabase/server"
-import { Library } from "@prisma/client"
+// import { Library } from "@prisma/client"
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 // import { Badge } from "@/components/ui/badge"
 // import LibraryReviews from "@/components/library-reviews"
@@ -13,73 +14,92 @@ import { Library } from "@prisma/client"
 
 // This would normally come from a database or API
 
+
 const getLibraryData = async(id: string) => {
-  const supabase = await createClient()
-  const { data: libraryData, error: libraryError } = await supabase
-    .from("Library")
-    .select("*")
-    .eq("id", id)
-    .single()
-  if (libraryError) {
-    console.error("Error fetching library data:", libraryError)
+  try {
+    const supabase = await createClient()
+    const { data: libraryData, error: libraryError } = await supabase
+      .from("Library")
+      .select("*")
+      .eq("id", id)
+      .single()
+    if (libraryError) {
+      console.error("Error fetching library data:", libraryError)
+      return null
+    }
+    if (!libraryData) {
+      console.error("Library not found")
+      return null
+    }
+    return libraryData
+    // return {
+    //   id,
+    //   name: "Central Public Library",
+    //   description:
+    //     "The Central Public Library is a state-of-the-art facility offering a wide range of resources and services to the community. With spacious reading areas, modern technology, and an extensive collection of books and digital media, it serves as a hub for learning and community engagement.",
+    //   location: "123 Main Street, New York, NY 10001",
+    //   hours: {
+    //     monday: "9:00 AM - 8:00 PM",
+    //     tuesday: "9:00 AM - 8:00 PM",
+    //     wednesday: "9:00 AM - 8:00 PM",
+    //     thursday: "9:00 AM - 8:00 PM",
+    //     friday: "9:00 AM - 6:00 PM",
+    //     saturday: "10:00 AM - 5:00 PM",
+    //     sunday: "12:00 PM - 5:00 PM",
+    //   },
+    //   rating: 4.8,
+    //   reviewCount: 124,
+    //   mainImage: "/placeholder.svg?height=600&width=1200",
+    //   gallery: [
+    //     "/placeholder.svg?height=400&width=600",
+    //     "/placeholder.svg?height=400&width=600",
+    //     "/placeholder.svg?height=400&width=600",
+    //     "/placeholder.svg?height=400&width=600",
+    //   ],
+    //   services: [
+    //     {
+    //       name: "Research Support",
+    //       description: "Professional assistance with research projects and academic inquiries",
+    //     },
+    //     { name: "Children's Programs", description: "Educational and entertaining programs for children of all ages" },
+    //     { name: "Digital Resources", description: "Access to e-books, online databases, and digital archives" },
+    //     { name: "Study Rooms", description: "Private and group study spaces available for reservation" },
+    //     { name: "Computer Access", description: "Free computer and internet access for all patrons" },
+    //     { name: "Printing Services", description: "Black and white and color printing available at affordable rates" },
+    //   ],
+    //   amenities: ["Free Wi-Fi", "Wheelchair Accessible", "Parking", "Café", "Restrooms", "Meeting Rooms"],
+    // }
+  } catch (error) {
+    console.error("Error in getLibraryData:", error)
     return null
   }
-  if (!libraryData) {
-    console.error("Library not found")
-    return null
-  }
-  return libraryData
-  // return {
-  //   id,
-  //   name: "Central Public Library",
-  //   description:
-  //     "The Central Public Library is a state-of-the-art facility offering a wide range of resources and services to the community. With spacious reading areas, modern technology, and an extensive collection of books and digital media, it serves as a hub for learning and community engagement.",
-  //   location: "123 Main Street, New York, NY 10001",
-  //   hours: {
-  //     monday: "9:00 AM - 8:00 PM",
-  //     tuesday: "9:00 AM - 8:00 PM",
-  //     wednesday: "9:00 AM - 8:00 PM",
-  //     thursday: "9:00 AM - 8:00 PM",
-  //     friday: "9:00 AM - 6:00 PM",
-  //     saturday: "10:00 AM - 5:00 PM",
-  //     sunday: "12:00 PM - 5:00 PM",
-  //   },
-  //   rating: 4.8,
-  //   reviewCount: 124,
-  //   mainImage: "/placeholder.svg?height=600&width=1200",
-  //   gallery: [
-  //     "/placeholder.svg?height=400&width=600",
-  //     "/placeholder.svg?height=400&width=600",
-  //     "/placeholder.svg?height=400&width=600",
-  //     "/placeholder.svg?height=400&width=600",
-  //   ],
-  //   services: [
-  //     {
-  //       name: "Research Support",
-  //       description: "Professional assistance with research projects and academic inquiries",
-  //     },
-  //     { name: "Children's Programs", description: "Educational and entertaining programs for children of all ages" },
-  //     { name: "Digital Resources", description: "Access to e-books, online databases, and digital archives" },
-  //     { name: "Study Rooms", description: "Private and group study spaces available for reservation" },
-  //     { name: "Computer Access", description: "Free computer and internet access for all patrons" },
-  //     { name: "Printing Services", description: "Black and white and color printing available at affordable rates" },
-  //   ],
-  //   amenities: ["Free Wi-Fi", "Wheelchair Accessible", "Parking", "Café", "Restrooms", "Meeting Rooms"],
-  // }
 }
-type tParams = Promise<{ slug: string[] }>;
-export default async function LibraryPage(props: { params: tParams }) {
-  const { slug } = await props.params;
-   const id = slug[1];
-   const library:Library = await getLibraryData(id)
+
+type Params = { id: string };
+export default async function LibraryPage(props: { params: Promise<Params> }) {
+  const { id } = await props.params;
+  const library = await getLibraryData(id);
+
+  if (!library) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Library Not Found</h1>
+          <Button asChild>
+            <Link href="/">Return to Home</Link>
+          </Button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen pb-16">
       {/* Hero Image */}
       <div className="relative h-[400px] w-full">
         <Image
-          src={library.photos[0] || "/placeholder.svg"}
-          alt={library.libraryName}
+          src={library.photos && library.photos.length > 0 ? library.photos[0] : "/placeholder.svg"}
+          alt={library.libraryName || "Library"}
           fill
           className="object-cover"
           priority
@@ -93,10 +113,10 @@ export default async function LibraryPage(props: { params: tParams }) {
                 Back to Libraries
               </Link>
             </Button>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{library.libraryName}</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{library.libraryName || "Library"}</h1>
             <div className="flex items-center text-white mb-4">
               <MapPin className="h-4 w-4 mr-1" />
-              <span>{library.address}</span>
+              <span>{library.address || "Address not available"}</span>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center bg-white/90 text-black px-3 py-1 rounded-full">
@@ -139,31 +159,31 @@ export default async function LibraryPage(props: { params: tParams }) {
               <ul className="space-y-2">
                 <li className="flex justify-between">
                   <span>Monday</span>
-                  <span>{library.openingTime} - {library.closingTime}</span>
+                  <span>{library.openingTime || "N/A"} - {library.closingTime || "N/A"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Tuesday</span>
-                  <span>{library.openingTime} - {library.closingTime}</span>
+                  <span>{library.openingTime || "N/A"} - {library.closingTime || "N/A"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Wednesday</span>
-                  <span>{library.openingTime} - {library.closingTime}</span>
+                  <span>{library.openingTime || "N/A"} - {library.closingTime || "N/A"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Thursday</span>
-                  <span>{library.openingTime} - {library.closingTime}</span>
+                  <span>{library.openingTime || "N/A"} - {library.closingTime || "N/A"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Friday</span>
-                  <span>{library.openingTime} - {library.closingTime}</span>
+                  <span>{library.openingTime || "N/A"} - {library.closingTime || "N/A"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Saturday</span>
-                  <span>{library.openingTime} - {library.closingTime}</span>
+                  <span>{library.openingTime || "N/A"} - {library.closingTime || "N/A"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Sunday</span>
-                  <span>{library.openingTime} - {library.closingTime}</span>
+                  <span>{library.openingTime || "N/A"} - {library.closingTime || "N/A"}</span>
                 </li>
               </ul>
             </div>
@@ -181,4 +201,3 @@ export default async function LibraryPage(props: { params: tParams }) {
     </main>
   )
 }
-

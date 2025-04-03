@@ -15,12 +15,14 @@ import { createClient } from '@/utils/supabase/client';
 import { facilitiesList, librarySchema } from '@/zod/zod';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 const supabase = createClient();
 
 
 export default function LibraryDetailsPage() {
   const router = useRouter();
+  const { user } = useAuth()
   const [libraryDetails, setLibraryDetails] = useState({
     libraryName: '',
     address: '',
@@ -73,11 +75,6 @@ export default function LibraryDetailsPage() {
   const uploadPhoto = async (file: File) => {
     try {
       // Ensure user is authenticated
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        throw new Error('User must be authenticated to upload');
-      }
 
       // Validate file
       if (!file) {
@@ -86,7 +83,7 @@ export default function LibraryDetailsPage() {
 
       // Generate a unique filename
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
       const filePath = `librarians/${fileName}`;
 
       // Perform the upload
@@ -119,7 +116,7 @@ export default function LibraryDetailsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setLoading(false);
   
     try {
       librarySchema.parse({
@@ -127,13 +124,6 @@ export default function LibraryDetailsPage() {
         photos,
         selectedFacilities
       });
-  
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-  
-      if (userError || !user) {
-        throw new Error('User must be authenticated');
-      }
-      
       let photosUrls: string[] = [];
       if (photos.length > 0) {
         try {
@@ -144,7 +134,6 @@ export default function LibraryDetailsPage() {
           throw new Error('Photo upload failed');
         }
       }
-      
       // Generate a UUID for the library
       const libraryId = uuidv4();
       
@@ -156,8 +145,8 @@ export default function LibraryDetailsPage() {
           ...libraryDetails,
           photos: photosUrls,
           facilities: selectedFacilities,
-          review_status: false,
-          librarianId: user.id
+          review_status: "pending",
+          librarianId: user?.id
         });
         if(libraryError) {
           console.error('Error inserting library:', libraryError);  

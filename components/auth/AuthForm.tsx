@@ -91,8 +91,10 @@ function AuthForm({ type, userType }: AuthFormProps) {
       </CardContent>
       
       <CardFooter className="mt-4 flex flex-col gap-6">
-      {(userType === "student" || userType === "librarian") &&(type == "login")&& (
-          <SignInWithGoogleButton />
+      {(userType === "student" || userType === "librarian")&& (
+          <SignInWithGoogleButton>
+            {isLoginForm ? "Login with Google" : "Sign Up with Google"}
+          </SignInWithGoogleButton>
         )}
         <Button className="w-full">
           {isPending ? (

@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { createClient } from '@/utils/supabase/client';
-import React from "react";
+import React, { ReactNode } from "react";
 
-const SignInWithGoogleButton = () => {
+const SignInWithGoogleButton = ({children} : { children: ReactNode }) => {
   const handleSignIn = async () => {
     try {
       const supabase = createClient();
@@ -38,7 +38,7 @@ const SignInWithGoogleButton = () => {
       className="w-full"
       onClick={handleSignIn}
     >
-      Login with Google
+      {children}
     </Button>
   );
 };

@@ -8,61 +8,63 @@ datasource db {
 }
 
 model Student {
-  id            String   @id @default(uuid())
-  username      String?   @unique
-  email         String   @unique
-  password      String?  // Optional for Google authentication
-  profileCompleted Boolean @default(false) // Track if the profile is complete
-  createdAt     DateTime @default(now())
+  id               String   @id @default(uuid())
+  username         String?  @unique
+  email            String   @unique
+  password         String? // Optional for Google authentication
+  profileCompleted Boolean  @default(false) // Track if the profile is complete
+  role             String   @default("student") // Role of the user (e.g., "student", "librarian", "admin")
+  createdAt        DateTime @default(now())
 }
 
 model Librarian {
-  id                String   @id @default(uuid())
-  username          String  @unique
-  email             String   @unique
-  password          String?  // Optional for Google authentication
-  profilePhoto      String?  // URL for uploaded profile photo
-  contactNumber     String?
-  address           String?
-  profileCompleted  Boolean  @default(false) // Track if the profile is complete
-  provider          String  // Track the authentication provider (e.g., "google")
-  createdAt         DateTime @default(now())
+  id               String   @id @default(uuid())
+  username         String   @unique
+  email            String   @unique
+  password         String? // Optional for Google authentication
+  profilePhoto     String? // URL for uploaded profile photo
+  contactNumber    String?
+  address          String?
+  profileCompleted Boolean  @default(false) // Track if the profile is complete
+  provider         String // Track the authentication provider (e.g., "google")
+  role             String   @default("librarian") // Role of the user (e.g., "student", "librarian", "admin")
+  createdAt        DateTime @default(now())
 
-  libraries         Library[]
+  libraries Library[]
 }
-
 
 model Admin {
   id        String   @id @default(uuid())
   username  String   @unique
   email     String   @unique
   password  String
+  role      String   @default("admin") // Role of the user (e.g., "student", "librarian", "admin")
   createdAt DateTime @default(now())
 }
 
 model Library {
-  id              String    @id @default(uuid())
-  libraryName     String
-  address         String
-  city            String
-  state           String
-  pincode         Int
-  googleMapLink   String?   // Optional field for Google Maps link
+  id            String  @id @default(uuid())
+  libraryName   String
+  address       String
+  city          String
+  state         String
+  pincode       Int
+  googleMapLink String? // Optional field for Google Maps link
 
-  photos          String[]  // Array of photo URLs
-  totalSeats      Int
-  openingTime     String    // Opening time (e.g., "08:00 AM")
-  closingTime     String    // Closing time (e.g., "10:00 PM")
-  
+  photos      String[] // Array of photo URLs
+  totalSeats  Int
+  openingTime String // Opening time (e.g., "08:00 AM")
+  closingTime String // Closing time (e.g., "10:00 PM")
+
   // New fields
-  whatsappNumber  String?   // Optional WhatsApp contact number
-  feePerHour      Float     // Fee for hours per day
-  feePerMonth     Float     // Fee per month
+  whatsappNumber String? // Optional WhatsApp contact number
+  feePerHour     Float // Fee for hours per day
+  feePerMonth    Float // Fee per month
 
-  facilities     String[]
-  review_status  Boolean @default(false) // Track if the library is reviewed
+  facilities    String[]
+  review_status String @default("approved") // Track if the library is reviewed
 
-  createdAt       DateTime  @default(now())
-  librarianId     String
-  librarian       Librarian @relation(fields: [librarianId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  librarianId String
+  librarian   Librarian @relation(fields: [librarianId], references: [id], onDelete: Cascade)
 }

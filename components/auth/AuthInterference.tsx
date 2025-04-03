@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "../ui/button";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
 
@@ -12,7 +13,7 @@ interface AuthInterferenceProps {
 function AuthInterference({ type }: AuthInterferenceProps) {
   const router = useRouter();
 
-  const handleRedirect = (userType: "student" | "librarian" | "admin") => {
+  const handleRedirect = (userType: "student" | "librarian") => {
     if (type === "login") {
       router.push(`login/${userType}`);
     } else {
@@ -42,13 +43,15 @@ function AuthInterference({ type }: AuthInterferenceProps) {
           >
             {type === "login" ? "Librarian Login" : "Librarian Sign Up"}
           </Button>
-          <Button
-            className="px-6 py-3 bg-red-100 text-red-700 hover:bg-red-200 border border-red-300 rounded-md shadow-sm"
-            onClick={() => handleRedirect("admin")}
-          >
-            {type === "login" ? "Admin Login" : "Admin Sign Up"}
-          </Button>
         </div>
+        
+        {/* Additional Line with Link */}
+        <p className="text-sm text-gray-600 mt-4">
+          {type === "login" ? "Don't have an account? " : "Already have an account? "}
+          <Link href={type === "login" ? "/sign-up" : "/login"} className="text-blue-600 hover:underline">
+            {type === "login" ? "Sign up here" : "Log in here"}
+          </Link>
+        </p>
       </div>
     </CardContent>
   );

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import LibrarianOnboarding from '@/components/profile/LibrarianOnboarding';
 import { Loader2 } from 'lucide-react'; // Assuming you have a loader icon
+import ProtectedRoute from '@/context/ProtectedRouteContext';
 
 export default function Onboarding() {
   const [user, setUser] = useState<{ username: string; email: string } | null>(null);
@@ -49,9 +50,11 @@ export default function Onboarding() {
 
   if (!user) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-gray-500">No user data found.</p>
-      </div>
+      <ProtectedRoute requiredRole="librarian">
+        <div className="flex justify-center items-center min-h-screen">
+          <p className="text-gray-500">No user data found.</p>
+        </div>
+      </ProtectedRoute>
     );
   }
 

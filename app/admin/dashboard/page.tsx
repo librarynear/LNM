@@ -18,8 +18,9 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Phone } from "lucide-react";
+import { Check, Phone, X } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import ProtectedRoute from "@/context/ProtectedRouteContext";
 
 // Define the Library type
 interface Library {
@@ -28,7 +29,8 @@ interface Library {
   address: string;
   photos: string[];
   whatsappNumber: string;
-  review_status: boolean;
+  review_status: "pending" | "approved" | "rejected";
+  rejected?: boolean;
   facilities: string[];
   feePerHour: number;
   librarianId: string;
@@ -48,7 +50,7 @@ export default function AdminDashboard() {
       const { data, error } = await supabase
         .from("Library")
         .select("*")
-        .eq("review_status", false);
+        .eq("review_status", "pending")
 
       if (error) {
         throw error;
@@ -57,12 +59,11 @@ export default function AdminDashboard() {
       setLibraries(data || []);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error("Error approving library:", err.message);
-        alert("Failed to approve library: " + err.message);
-      setError(err.message || "Failed to load libraries");}
-      else {
+        console.error("Error loading libraries:", err.message);
+        setError(err.message || "Failed to load libraries");
+      } else {
         console.error("Unexpected error:", err);
-        alert("An unexpected error occurred.");
+        setError("An unexpected error occurred");
       }
     } finally {
       setLoading(false);
@@ -74,7 +75,7 @@ export default function AdminDashboard() {
     try {
       const { error } = await supabase
         .from("Library")
-        .update({ review_status: true })
+        .update({ review_status: "approved" })
         .eq("id", libraryId);
 
       if (error) {
@@ -89,12 +90,33 @@ export default function AdminDashboard() {
     }
   };
 
+  // Reject library
+  const rejectLibrary = async (libraryId: string) => {
+    try {
+      const { error } = await supabase
+        .from("Library")
+        .update({ review_status: "rejected" })
+        .eq("id", libraryId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Remove the rejected library from the list
+      setLibraries(libraries.filter(lib => lib.id !== libraryId));
+    } catch (err) {
+      console.error("Error rejecting library:", err);
+      alert("Failed to reject library: " + (err instanceof Error ? err.message : "Unknown error"));
+    }
+  };
+
   // Initial fetch
   useEffect(() => {
     fetchPendingLibraries();
   }, []);
 
   return (
+    <ProtectedRoute requiredRole="admin">
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b py-6 shadow-sm">
@@ -199,6 +221,15 @@ export default function AdminDashboard() {
                               <Check className="h-4 w-4 mr-1" />
                               Approve
                             </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                              onClick={() => rejectLibrary(library.id)}
+                            >
+                              <X className="h-4 w-4 mr-1" />
+                              Reject
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -211,5 +242,6 @@ export default function AdminDashboard() {
         </Card>
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

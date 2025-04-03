@@ -88,8 +88,8 @@ export const librarySchema = z.object({
   feePerMonth: z.coerce.number()
     .nonnegative({ message: "Fee per month cannot be negative" }),
 
-  review_status: z.boolean()
-    .default(false),
+  review_status: z.enum(["pending", "approved", "rejected"])
+    .default("pending"),
 
   // Facilities Validation
   selectedFacilities: z.array(z.enum(facilitiesList))

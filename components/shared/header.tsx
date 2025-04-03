@@ -1,58 +1,25 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
 import LogOutButton from "./LogOutButton";
-import { createClient } from "@/utils/supabase/client";
-import { User } from '@supabase/supabase-js';
-import { useRouter } from 'next/navigation';
-import { getUserType, UserType } from "@/utils/supabase/getUserType";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
-type HeaderProps = {
-  initialUser?: User | null;
-};
-
-export default function Header({ initialUser = null }: HeaderProps) {
-  const [user, setUser] = useState<User | null>(initialUser);
-  const [usertype, setUserType] = useState<UserType>(null);
-  const router = useRouter();
-  
-  useEffect(() => {
-    // Create a supabase client
-    const supabase = createClient();
-    
-    // Check current auth state on mount
-    const checkUser = async () => {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      const {type} = await getUserType();
-      setUserType(type);
-      setUser(currentUser);
-    };
-    
-    checkUser();
-    
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {  
-        // Update local state
-        setUser(session?.user || null);
-        
-        // Force a router refresh on auth events to update server components
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          router.refresh();
-        }
-      }
-    );
-    
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router]);
+export default function Header() {
+  const { user, userRole } = useAuth();
+  // Navigation items to avoid repetition
+  const navItems = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About Us" },
+    { href: "/contact", label: "Contact" }
+  ];
+    const router = useRouter();
+  function handleLogout(){
+    router.push("/home")
+  }
 
   return (
     <header className="border-b fixed top-0 w-full backdrop-blur-2xl z-10">
@@ -71,32 +38,30 @@ export default function Header({ initialUser = null }: HeaderProps) {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="/" className="text-sm font-medium hover:text-yellow-500 transition-colors">
-            Home
-          </Link>
-          <Link href="/about" className="text-sm font-medium hover:text-yellow-500 transition-colors">
-            About Us
-          </Link>
-          <Link href="/contact" className="text-sm font-medium hover:text-yellow-500 transition-colors">
-            Contact
-          </Link>
+          {navItems.map(item => (
+            <Link 
+              key={item.href}
+              href={item.href} 
+              className="text-sm font-medium hover:text-yellow-500 transition-colors"
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
-          {usertype === "librarian" && (
+          {userRole === "librarian" && (
             <Link href="/add-library" className="text-sm font-medium hover:text-yellow-500 transition-colors mr-10">
               Add Library
-              </Link>
-              )}
-            {usertype === "admin" && (
+            </Link>
+          )}
+          {userRole === "admin" && (
             <Link href="/admin/dashboard" className="text-sm font-medium hover:text-yellow-500 transition-colors mr-10">
               Admin Dashboard
-              </Link>
-            )}
+            </Link>
+          )}
           {user ? (
-            <>
-              <LogOutButton onLogout={() => setUser(null)}  />
-            </>
+            <LogOutButton onLogout={handleLogout} />
           ) : (
             <>
               <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white" asChild>
@@ -132,19 +97,30 @@ export default function Header({ initialUser = null }: HeaderProps) {
                 </Link>
               </div>
               <nav className="flex flex-col px-3 space-y-6">
-                <Link href="/" className="text-lg font-medium hover:text-yellow-500 transition-colors">
-                  Home
-                </Link>
-                <Link href="/about" className="text-lg font-medium hover:text-yellow-500 transition-colors">
-                  About Us
-                </Link>
-                <Link href="/contact" className="text-lg font-medium hover:text-yellow-500 transition-colors">
-                  Contact
-                </Link>
+                {navItems.map(item => (
+                  <Link 
+                    key={`mobile-${item.href}`}
+                    href={item.href} 
+                    className="text-lg font-medium hover:text-yellow-500 transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                
+                {userRole === "librarian" && (
+                  <Link href="/add-library" className="text-lg font-medium hover:text-yellow-500 transition-colors">
+                    Add Library
+                  </Link>
+                )}
+                {userRole === "admin" && (
+                  <Link href="/admin/dashboard" className="text-lg font-medium hover:text-yellow-500 transition-colors">
+                    Admin Dashboard
+                  </Link>
+                )}
               </nav>
               <div className="mt-auto pt-6 flex flex-col space-y-4">
                 {user ? (
-                  <LogOutButton onLogout={() => setUser(null)} />
+                  <LogOutButton />
                 ) : (
                   <>
                     <Button

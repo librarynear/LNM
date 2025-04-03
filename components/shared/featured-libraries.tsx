@@ -20,7 +20,7 @@ export default function FeaturedLibraries() {
       const { data, error } = await supabase
         .from("Library")
         .select("*")
-        .eq("review_status", true)
+        .eq("review_status", "approved")
 
       if (error) {
         console.error("Error fetching libraries:", error);

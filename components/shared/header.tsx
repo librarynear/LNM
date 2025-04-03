@@ -7,11 +7,9 @@ import { Menu } from "lucide-react";
 import LogOutButton from "./LogOutButton";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function Header() {
   const { user, userRole } = useAuth();
-  const [toggle, setToggle] = useState(true);
   // Navigation items to avoid repetition
   const navItems = [
     { href: "/", label: "Home" },

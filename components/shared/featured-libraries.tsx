@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link";
-import { Star, MapPin, Clock, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, MapPin, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
@@ -113,9 +113,9 @@ export default function FeaturedLibraries() {
                 },
               }}
               onInit={(swiper) => {
-                // @ts-ignore
+                //@ts-expect-error : Swiper's type definitions may not include all properties
                 swiper.params.navigation.prevEl = prevRef.current;
-                // @ts-ignore
+                //@ts-expect-error : Swiper's type definitions may not include all properties
                 swiper.params.navigation.nextEl = nextRef.current;
                 swiper.navigation.init();
                 swiper.navigation.update();

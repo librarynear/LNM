@@ -9,9 +9,9 @@ export default function AboutPage() {
   return (
     <main className="flex min-h-screen flex-col">
       {/* Hero Section */}
-      <section className=" py-28">
+      <section className="py-28">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="mb-6 text-4xl font-bold  md:text-5xl">
+          <h1 className="mb-6 text-4xl font-bold md:text-5xl">
             About <span className="text-yellow-400">LibraryNear.com</span>
           </h1>
           <p className="mx-auto mb-8 max-w-2xl text-lg text-gray-300">
@@ -44,10 +44,10 @@ export default function AboutPage() {
               </div>
               <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-xl">
                 <Image
-                  src="/placeholder.svg?height=600&width=800"
+                  src="/placeholder.svg"
                   alt="Library interior with bookshelves"
-                  fill
-                  className="object-cover"
+                  layout="fill"
+                  objectFit="cover"
                 />
               </div>
             </div>
@@ -115,36 +115,13 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold">Meet Our Team</h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* <TeamMember
-              name="Alex Johnson"
-              role="Founder & CEO"
-              image="/placeholder.svg?height=400&width=400"
-              bio="Former librarian with a passion for making library resources accessible to all."
-            />
-            <TeamMember
-              name="Sam Rivera"
-              role="Chief Technology Officer"
-              image="/placeholder.svg?height=400&width=400"
-              bio="Tech enthusiast dedicated to building platforms that connect communities."
-            />
-            <TeamMember
-              name="Jamie Chen"
-              role="Head of Partnerships"
-              image="/placeholder.svg?height=400&width=400"
-              bio="Works directly with libraries to ensure their needs are met on our platform."
-            />
-            <TeamMember
-              name="Taylor Morgan"
-              role="User Experience Designer"
-              image="/placeholder.svg?height=400&width=400"
-              bio="Focused on creating intuitive experiences for both libraries and users."
-            /> */}
+            {/* <TeamMember /> components commented out */}
           </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className=" py-20">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold">
             Our <span className="text-yellow-400">Values</span>
@@ -159,19 +136,7 @@ export default function AboutPage() {
             <div className="rounded-lg bg-gray-100 p-6">
               <h3 className="mb-3 text-xl font-bold">Community</h3>
               <p className="text-gray-800">
-                Libraries are community hubs, and we're committed to strengthening these vital connections.
-              </p>
-            </div>
-            <div className="rounded-lg bg-gray-100 p-6">
-              <h3 className="mb-3 text-xl font-bold">Innovation</h3>
-              <p className="text-gray-800">
-                We embrace new technologies and ideas to better serve libraries and their patrons.
-              </p>
-            </div>
-            <div className="rounded-lg bg-gray-100 p-6">
-              <h3 className="mb-3 text-xl font-bold">Integrity</h3>
-              <p className="text-gray-800">
-                We operate with transparency and honesty in all our interactions and partnerships.
+                Libraries are community hubs, and we&apos;re committed to strengthening these vital connections.
               </p>
             </div>
           </div>
@@ -183,4 +148,3 @@ export default function AboutPage() {
     </main>
   )
 }
-

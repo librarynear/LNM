@@ -1,7 +1,7 @@
 import HeroSection from "@/components/home/herosection";
 import FeaturedLibraries from "@/components/shared/featured-libraries";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (

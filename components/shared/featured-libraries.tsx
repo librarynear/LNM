@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import { Star, MapPin, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -21,7 +21,8 @@ export default function FeaturedLibraries() {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
-  const supabase = createClient();
+  useEffect(() => {
+    const supabase = createClient();
     const fetchLibraries = async () => {
       setLoading(true);
       const { data, error } = await supabase
@@ -39,6 +40,7 @@ export default function FeaturedLibraries() {
       setLoading(false);
     };
     fetchLibraries();
+  }, []);
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-gray-50">

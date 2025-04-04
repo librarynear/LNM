@@ -4,7 +4,7 @@ import { Icons } from "@/public/icons/icons";
 export default function Footer() {
   return (
     <footer className="bg-slate-950 text-slate-200 py-8">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-28 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Us Column */}
           <div>
@@ -52,7 +52,7 @@ export default function Footer() {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-12 border-t border-slate-800 pt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="mt-12 border-t border-slate-800 pt-8 grid grid-cols-1 md:grid-cols-1 gap-8">
           <div>
             <h3 className="text-amber-500 font-semibold text-lg mb-4">Contact Us</h3>
             <ul className="space-y-2">

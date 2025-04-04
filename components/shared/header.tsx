@@ -16,34 +16,35 @@ export default function Header() {
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact" }
   ];
-    const router = useRouter();
-  function handleLogout(){
-    router.push("/login")
-    
+  const router = useRouter();
+  
+  function handleLogout() {
+    router.push("/login");
   }
 
   return (
-    <header className="border-b fixed top-0 w-full backdrop-blur-2xl z-10">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b fixed top-0 w-full backdrop-blur-md bg-white/95 z-50 shadow-sm">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center">
-          <div className="relative h-10 w-40">
+          <div className="relative">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-tj1eTru6ptXyXV3BkNAQxnyhtqzuMp.png"
+              src="/logo.png"
               alt="LibraryNear.com Logo"
-              fill
-              className="object-contain"
+              width={50}
+              height={50}
+              className="object-contain h-full"
               priority
             />
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          {navItems.map(item => (
-            <Link 
+        <nav className="hidden md:flex items-center space-x-10">
+          {navItems.map((item) => (
+            <Link
               key={item.href}
-              href={item.href} 
-              className="text-sm font-medium hover:text-yellow-500 transition-colors"
+              href={item.href}
+              className="text-sm font-medium text-gray-700 hover:text-yellow-600 transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-yellow-500 after:transition-all hover:after:w-full"
             >
               {item.label}
             </Link>
@@ -52,12 +53,18 @@ export default function Header() {
 
         <div className="hidden md:flex items-center space-x-4">
           {userRole === "librarian" && (
-            <Link href="/add-library" className="text-sm font-medium hover:text-yellow-500 transition-colors mr-10">
+            <Link
+              href="/add-library"
+              className="text-sm font-medium text-gray-700 hover:text-yellow-600 transition-colors mr-6"
+            >
               Add Library
             </Link>
           )}
           {userRole === "admin" && (
-            <Link href="/admin/dashboard" className="text-sm font-medium hover:text-yellow-500 transition-colors mr-10">
+            <Link
+              href="/admin/dashboard"
+              className="text-sm font-medium text-gray-700 hover:text-yellow-600 transition-colors mr-6"
+            >
               Admin Dashboard
             </Link>
           )}
@@ -65,10 +72,16 @@ export default function Header() {
             <LogOutButton onLogout={handleLogout} />
           ) : (
             <>
-              <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white" asChild>
-                <Link href="/login" className="hidden sm:block">Log In</Link>
+              <Button
+                variant="outline"
+                className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-400 transition-colors"
+                asChild
+              >
+                <Link href="/login" className="hidden sm:block">
+                  Log In
+                </Link>
               </Button>
-              <Button className="bg-yellow-400 text-black hover:bg-yellow-500" asChild>
+              <Button className="bg-yellow-500 text-white hover:bg-yellow-600 shadow-sm transition-all hover:shadow-md" asChild>
                 <Link href="/sign-up">Sign Up</Link>
               </Button>
             </>
@@ -78,60 +91,70 @@ export default function Header() {
         {/* Mobile Navigation */}
         <Sheet>
           <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <Menu className="h-10 w-10" />
+            <Button variant="ghost" size="icon" className="text-gray-700 hover:bg-gray-100 rounded-full">
+              <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right">
+          <SheetContent side="right" className="bg-white/95 backdrop-blur-md">
             <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center mb-8">
+              <div className="flex justify-between items-center mb-8 pt-2">
                 <Link href="/" className="flex items-center">
-                  <div className="relative h-8 w-32">
+                  <div className="relative h-10 w-10">
                     <Image
-                      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-tj1eTru6ptXyXV3BkNAQxnyhtqzuMp.png"
+                      src="/logo.png"
                       alt="LibraryNear.com Logo"
                       fill
                       className="object-contain"
                     />
                   </div>
+                  <span className="ml-2 text-lg font-semibold text-gray-800">LibraryNear</span>
                 </Link>
               </div>
-              <nav className="flex flex-col px-3 space-y-6">
-                {navItems.map(item => (
-                  <Link 
+              <nav className="flex flex-col px-3 space-y-5">
+                {navItems.map((item) => (
+                  <Link
                     key={`mobile-${item.href}`}
-                    href={item.href} 
-                    className="text-lg font-medium hover:text-yellow-500 transition-colors"
+                    href={item.href}
+                    className="text-lg font-medium text-gray-700 hover:text-yellow-600 transition-colors"
                   >
                     {item.label}
                   </Link>
                 ))}
-                
+
                 {userRole === "librarian" && (
-                  <Link href="/add-library" className="text-lg font-medium hover:text-yellow-500 transition-colors">
+                  <Link
+                    href="/add-library"
+                    className="text-lg font-medium text-gray-700 hover:text-yellow-600 transition-colors"
+                  >
                     Add Library
                   </Link>
                 )}
                 {userRole === "admin" && (
-                  <Link href="/admin/dashboard" className="text-lg font-medium hover:text-yellow-500 transition-colors">
+                  <Link
+                    href="/admin/dashboard"
+                    className="text-lg font-medium text-gray-700 hover:text-yellow-600 transition-colors"
+                  >
                     Admin Dashboard
                   </Link>
                 )}
               </nav>
               <div className="mt-auto pt-6 flex flex-col space-y-4">
                 {user ? (
-                  <LogOutButton />
+                  <LogOutButton onLogout={handleLogout} />
                 ) : (
                   <>
                     <Button
                       variant="outline"
-                      className="w-full border-black text-black hover:bg-black hover:text-white"
+                      className="w-full border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
                       asChild
                     >
                       <Link href="/login">Log In</Link>
                     </Button>
-                    <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500" asChild>
+                    <Button
+                      className="w-full bg-yellow-500 text-white hover:bg-yellow-600 shadow-sm"
+                      asChild
+                    >
                       <Link href="/sign-up">Sign Up</Link>
                     </Button>
                   </>

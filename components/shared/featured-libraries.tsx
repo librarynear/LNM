@@ -21,8 +21,7 @@ export default function FeaturedLibraries() {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
-  useEffect(() => {
-    const supabase = createClient();
+  const supabase = createClient();
     const fetchLibraries = async () => {
       setLoading(true);
       const { data, error } = await supabase
@@ -40,7 +39,6 @@ export default function FeaturedLibraries() {
       setLoading(false);
     };
     fetchLibraries();
-  }, []);
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-gray-50">

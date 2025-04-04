@@ -123,12 +123,20 @@ export default function Header() {
                 ))}
 
                 {userRole === "librarian" && (
+                  <div>
                   <Link
                     href="/add-library"
                     className="text-lg font-medium text-gray-700 hover:text-yellow-600 transition-colors"
                   >
                     Add Library
                   </Link>
+                  <Link
+                    href="/librarian/dashboard"
+                    className="text-lg font-medium text-gray-700 hover:text-yellow-600 transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  </div>
                 )}
                 {userRole === "admin" && (
                   <Link

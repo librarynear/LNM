@@ -20,9 +20,10 @@ export default function FeaturedLibraries() {
   
   const prevRef = useRef(null);
   const nextRef = useRef(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    const supabase = createClient();
+    
     const fetchLibraries = async () => {
       setLoading(true);
       const { data, error } = await supabase

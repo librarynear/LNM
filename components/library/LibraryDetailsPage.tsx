@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,14 +15,26 @@ import { createClient } from '@/utils/supabase/client';
 import { facilitiesList, librarySchema } from '@/zod/zod';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { getUserType } from '@/utils/supabase/getUserType';
+import { User } from '@supabase/supabase-js';
 
 const supabase = createClient();
 
 
 export default function LibraryDetailsPage() {
   const router = useRouter();
-  const { user } = useAuth()
+    const [user, setUser] = useState<User | null>(null);
+  
+    useEffect(() => {
+    const getUser = async () => {
+      const {type : userRole , data :user} = await getUserType();
+      return { userRole, user };
+    }
+      getUser().then(({ user }) => {
+        setUser(user);
+      });
+    }
+    , []);
   const [libraryDetails, setLibraryDetails] = useState({
     libraryName: '',
     address: '',

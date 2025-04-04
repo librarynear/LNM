@@ -4,7 +4,6 @@ import "./globals.css";
 import Header from "@/components/shared/header";
 import Footer from "@/components/shared/footer";
 import { Toaster } from "@/components/ui/sonner"
-import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,14 +30,12 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
           <Header/>
           <div className="min-h-screen">
             {children}
             <Toaster />
           </div>
           <Footer />
-        </AuthProvider>
       </body>
     </html>
   );

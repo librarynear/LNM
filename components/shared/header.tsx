@@ -5,11 +5,27 @@ import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
 import LogOutButton from "./LogOutButton";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { getUserType, UserType } from "@/utils/supabase/getUserType";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 export default function Header() {
-  const { user, userRole } = useAuth();
+  const [userRole, setUserRole] = useState<UserType>("unknown");
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+  const getUser = async () => {
+    const {type : userRole , data :user} = await getUserType();
+    return { userRole, user };
+  }
+    getUser().then(({ userRole, user }) => {
+      setUserRole(userRole);
+      setUser(user);
+    });
+  }
+  , []);
   // Navigation items to avoid repetition
   const navItems = [
     { href: "/", label: "Home" },
@@ -19,11 +35,13 @@ export default function Header() {
   const router = useRouter();
   
   function handleLogout() {
+    toast.success("Logged out successfully");
+    setUser(null);
     router.push("/login");
   }
 
   return (
-    <header className="border-b fixed top-0 w-full backdrop-blur-md bg-white/95 z-50 shadow-sm">
+    <header className="border-b fixed top-0 w-full backdrop-blur-md bg-white/95 z-50 shadow-sm px-4">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <div className="relative">
@@ -53,12 +71,20 @@ export default function Header() {
 
         <div className="hidden md:flex items-center space-x-4">
           {userRole === "librarian" && (
+            <div>
             <Link
               href="/add-library"
               className="text-sm font-medium text-gray-700 hover:text-yellow-600 transition-colors mr-6"
             >
               Add Library
             </Link>
+            <Link
+              href="/librarian/dashboard"
+              className="text-sm font-medium text-gray-700 hover:text-yellow-600 transition-colors mr-6"
+            >
+              Dashboard
+            </Link>
+            </div>
           )}
           {userRole === "admin" && (
             <Link

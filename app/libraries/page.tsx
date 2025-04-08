@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 // Updated type definition to match the new schema
 type LibraryPlan = {
   id: string;
+  libraryId: string;
   hours: string;
   monthlyFee: string;
   planType: string;
@@ -25,7 +26,7 @@ type Library = {
   facilities: string[];
   photos: string[];
   review_status: string;
-  plans: LibraryPlan[];
+  plans?: LibraryPlan[];
   // Include other fields as needed
 };
 
@@ -45,18 +46,37 @@ export default function AllLibrariesPage() {
       const supabase = createClient();
       
       try {
-        const { data, error } = await supabase
+        // Fetch libraries
+        const { data: librariesData, error: librariesError } = await supabase
           .from("Library")
           .select("*")
           .eq("review_status", "approved");
           
-        if (error) {
-          console.error("Error fetching libraries:", error);
+        if (librariesError) {
+          console.error("Error fetching libraries:", librariesError);
           setError("Failed to load libraries");
-        } else {
-          console.log("All Libraries:", data);
-          setLibraries(data);
+          return;
         }
+        
+        // Fetch library plans
+        const { data: plansData, error: plansError } = await supabase
+          .from("LibraryPlan")
+          .select("*");
+          
+        if (plansError) {
+          console.error("Error fetching library plans:", plansError);
+          setError("Failed to load library plans");
+          return;
+        }
+        
+        // Combine libraries with their plans
+        const librariesWithPlans = librariesData.map(library => ({
+          ...library,
+          plans: plansData.filter(plan => plan.libraryId === library.id)
+        }));
+        
+        console.log("Libraries with plans:", librariesWithPlans);
+        setLibraries(librariesWithPlans);
       } catch (err) {
         console.error("Exception fetching libraries:", err);
         setError("An unexpected error occurred");
@@ -70,7 +90,11 @@ export default function AllLibrariesPage() {
   
   // Helper function to get the "Any Time" plan hourly rate
   const getBasicPlanHourlyRate = (library: Library): number => {
-    const anyTimePlan = library.plans?.find(
+    if (!library.plans || library.plans.length === 0) {
+      return 0;
+    }
+    
+    const anyTimePlan = library.plans.find(
       plan => plan.planType === "Any Time" || 
               (plan.description?.toLowerCase().includes("basic") && 
                !plan.description?.toLowerCase().includes("seat"))
@@ -82,7 +106,7 @@ export default function AllLibrariesPage() {
       const hours = parseFloat(anyTimePlan.hours);
       
       // Return hourly rate or 0 if calculation isn't possible
-      return hours > 0 ? monthlyFee / hours : 0;
+      return isNaN(monthlyFee) || isNaN(hours) || hours === 0 ? 0 : monthlyFee / hours;
     }
     
     return 0; // Default if no matching plan is found

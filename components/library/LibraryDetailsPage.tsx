@@ -46,9 +46,7 @@ export default function LibraryDetailsPage() {
     totalSeats: '',
     openingTime: '',
     closingTime: '',
-    whatsappNumber: '',
-    feePerHour: '',
-    feePerMonth: ''
+    whatsappNumber: ''
   });
   // interface FormData_library {
   //   libraryName: string;
@@ -146,53 +144,89 @@ export default function LibraryDetailsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(false);
+    setLoading(true);
   
     try {
-      librarySchema.parse({
+      // Validate with Zod schema
+       librarySchema.parse({
         ...libraryDetails,
+        totalSeats: parseInt(libraryDetails.totalSeats), // Convert to number for Zod validation
         plans,
         photos,
         selectedFacilities
       });
+  
+      // Upload photos
       let photosUrls: string[] = [];
       if (photos.length > 0) {
         try {
           photosUrls = await Promise.all(photos.map(photo => uploadPhoto(photo)));
-        }
-        catch (error) {
+        } catch (error) {
           console.error('Error uploading photos:', error);
           throw new Error('Photo upload failed');
         }
       }
-      // Generate a UUID for the library
-      const libraryId = uuidv4();
-      
-      // Insert the library with the explicit id
-      const { error: libraryError } = await supabase
+  
+      // Prepare data for Prisma - important type conversions here
+      const libraryData = {
+        id: uuidv4(), // Generate UUID for library
+        libraryName: libraryDetails.libraryName,
+        address: libraryDetails.address,
+        city: libraryDetails.city,
+        state: libraryDetails.state,
+        pincode: parseInt(libraryDetails.pincode), // Convert string to integer
+        googleMapLink: libraryDetails.googleMapLink,
+        totalSeats: parseInt(libraryDetails.totalSeats), // Convert string to integer
+        openingTime: libraryDetails.openingTime,
+        closingTime: libraryDetails.closingTime,
+        whatsappNumber: libraryDetails.whatsappNumber,
+        facilities: selectedFacilities,
+        photos: photosUrls,
+        review_status: "pending",
+        librarianId: user?.id
+      };
+  
+      // Create the library first
+      const { data: libraryResponse, error: libraryError } = await supabase
         .from('Library')
-        .insert({
-          id: libraryId,
-          ...libraryDetails,
-          plans,
-          photos: photosUrls,
-          facilities: selectedFacilities,
-          review_status: "pending",
-          librarianId: user?.id
-        });
-        if(libraryError) {
-          console.error('Error inserting library:', libraryError);  
-          throw new Error('Library insertion failed');
-        }
+        .insert(libraryData)
+        .select();
+  
+      if (libraryError) {
+        console.error('Error inserting library:', libraryError);
+        console.error('Details:', JSON.stringify(libraryError));
+        throw new Error(`Library insertion failed: ${libraryError.message}`);
+      }
+  
+      // Now create the plans as separate records linked to the library
+      const libraryId = libraryResponse[0].id;
       
+      // Prepare plans data
+      const plansData = plans.map(plan => ({
+        id: plan.id,
+        hours: plan.hours,
+        monthlyFee: plan.monthlyFee,
+        planType: plan.planType,
+        description: plan.description,
+        libraryId: libraryId // Link to the library
+      }));
+  
+      // Insert all plans
+      const { error: plansError } = await supabase
+        .from('LibraryPlan')
+        .insert(plansData);
+  
+      if (plansError) {
+        console.error('Error inserting plans:', plansError);
+        throw new Error('Plans insertion failed');
+      }
+  
       toast.success('Library details submitted successfully!');
       router.push('/librarian/dashboard');
-    }
-    catch (error) {
+    } catch (error) {
       toast.error('Error submitting library details. Please try again.');
       console.error('Error:', error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };

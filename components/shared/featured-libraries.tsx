@@ -15,6 +15,7 @@ import { createClient } from "@/utils/supabase/client";
 // Updated type definitions to match the new schema
 type LibraryPlan = {
   id: string;
+  libraryId: string; // Foreign key to connect with Library
   hours: string;
   monthlyFee: string;
   planType: string;
@@ -28,7 +29,7 @@ type Library = {
   facilities: string[];
   photos: string[];
   review_status: string;
-  plans: LibraryPlan[];
+  plans?: LibraryPlan[]; // This will be populated after fetching
   // Include other fields as needed
 };
 
@@ -44,26 +45,58 @@ export default function FeaturedLibraries() {
   useEffect(() => {
     const fetchLibraries = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("Library")
-        .select("*")
-        .eq("review_status", "approved")
+      try {
+        // Fetch libraries
+        const { data: librariesData, error: librariesError } = await supabase
+          .from("Library")
+          .select("*")
+          .eq("review_status", "approved");
 
-      if (error) {
-        console.error("Error fetching libraries:", error);
-        setError("Failed to load libraries");
-      } else {
-        console.log("Featured Libraries:", data);
-        setLibraries(data);
+        if (librariesError) {
+          console.error("Error fetching libraries:", librariesError);
+          setError("Failed to load libraries");
+          setLoading(false);
+          return;
+        }
+        
+        // Fetch library plans
+        const { data: plansData, error: plansError } = await supabase
+          .from("LibraryPlan")
+          .select("*");
+          
+        if (plansError) {
+          console.error("Error fetching library plans:", plansError);
+          setError("Failed to load library plans");
+          setLoading(false);
+          return;
+        }
+        
+        // Combine libraries with their plans
+        const librariesWithPlans = librariesData.map(library => ({
+          ...library,
+          plans: plansData.filter(plan => plan.libraryId === library.id)
+        }));
+        
+        console.log("Featured Libraries:", librariesWithPlans);
+        setLibraries(librariesWithPlans);
+      } catch (err) {
+        console.error("Exception fetching libraries:", err);
+        setError("An unexpected error occurred");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
+    
     fetchLibraries();
   }, []);
 
   // Helper function to get the "Any Time" plan hourly rate
   const getBasicPlanHourlyRate = (library: Library): number => {
-    const anyTimePlan = library.plans?.find(
+    if (!library.plans || library.plans.length === 0) {
+      return 0;
+    }
+    
+    const anyTimePlan = library.plans.find(
       plan => plan.planType === "Any Time" || 
               (plan.description?.toLowerCase().includes("basic") && 
                !plan.description?.toLowerCase().includes("seat"))
@@ -75,7 +108,7 @@ export default function FeaturedLibraries() {
       const hours = parseFloat(anyTimePlan.hours);
       
       // Return hourly rate or 0 if calculation isn't possible
-      return hours > 0 ? monthlyFee / hours : 0;
+      return isNaN(monthlyFee) || isNaN(hours) || hours === 0 ? 0 : monthlyFee / hours;
     }
     
     return 0; // Default if no matching plan is found

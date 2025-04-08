@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { getUserType } from '@/utils/supabase/getUserType';
 import { User } from '@supabase/supabase-js';
+import  LibraryPlansManager from './LibraryPlansManager';
 
 const supabase = createClient();
 
@@ -68,7 +69,24 @@ export default function LibraryDetailsPage() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [isFacilitiesOpen, setIsFacilitiesOpen] = useState(false);
-
+  const [plans, setPlans] = useState([
+    // Basic Plan (first default plan)
+    {
+      id: '1',
+      hours: '6',
+      monthlyFee: '600',
+      planType: 'Any Time',
+      description: 'Basic Plan'
+    },
+    // Seat Allotment Plan (second default plan)
+    {
+      id: '2',
+      hours: '24',
+      monthlyFee: '1200',
+      planType: 'Fixed Seat',
+      description: 'Fixed seat allocation'
+    }
+  ]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLibraryDetails(prev => ({
@@ -133,6 +151,7 @@ export default function LibraryDetailsPage() {
     try {
       librarySchema.parse({
         ...libraryDetails,
+        plans,
         photos,
         selectedFacilities
       });
@@ -155,6 +174,7 @@ export default function LibraryDetailsPage() {
         .insert({
           id: libraryId,
           ...libraryDetails,
+          plans,
           photos: photosUrls,
           facilities: selectedFacilities,
           review_status: "pending",
@@ -251,33 +271,7 @@ export default function LibraryDetailsPage() {
           </div>
 
           {/* Fees Section */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label className="mb-2 block">Fee per Hour (₹)</Label>
-              <Input
-                type="number"
-                placeholder="Enter Fee per Hour"
-                className="w-full"
-                name="feePerHour"
-                value={libraryDetails.feePerHour}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div>
-              <Label className="mb-2 block">Fee per Month (₹)</Label>
-              <Input
-                type="number"
-                placeholder="Enter Fee per Month"
-                className="w-full"
-                name="feePerMonth"
-                value={libraryDetails.feePerMonth}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
-
+          <LibraryPlansManager plans={plans} setPlans={setPlans} />
           {/* Address Details */}
           <div className="grid md:grid-cols-3 gap-4">
             <div>

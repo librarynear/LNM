@@ -3,11 +3,31 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star, MapPin, ArrowRight, Search, Filter } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
-import { Library } from "@prisma/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
+// Updated type definition to match the new schema
+type LibraryPlan = {
+  id: string;
+  hours: string;
+  monthlyFee: string;
+  planType: string;
+  description?: string;
+};
+
+// Extended Library type to include the new plans field
+type Library = {
+  id: string;
+  libraryName: string;
+  address: string;
+  facilities: string[];
+  photos: string[];
+  review_status: string;
+  plans: LibraryPlan[];
+  // Include other fields as needed
+};
 
 export default function AllLibrariesPage() {
   const [libraries, setLibraries] = useState<Library[] | null>(null);
@@ -48,6 +68,26 @@ export default function AllLibrariesPage() {
     fetchAllLibraries();
   }, []);
   
+  // Helper function to get the "Any Time" plan hourly rate
+  const getBasicPlanHourlyRate = (library: Library): number => {
+    const anyTimePlan = library.plans?.find(
+      plan => plan.planType === "Any Time" || 
+              (plan.description?.toLowerCase().includes("basic") && 
+               !plan.description?.toLowerCase().includes("seat"))
+    );
+    
+    if (anyTimePlan) {
+      // Calculate hourly rate based on monthly fee and hours
+      const monthlyFee = parseFloat(anyTimePlan.monthlyFee);
+      const hours = parseFloat(anyTimePlan.hours);
+      
+      // Return hourly rate or 0 if calculation isn't possible
+      return hours > 0 ? monthlyFee / hours : 0;
+    }
+    
+    return 0; // Default if no matching plan is found
+  };
+  
   // Filter libraries based on search term and filters
   const filteredLibraries = libraries ? libraries.filter(library => {
     // Search term filter
@@ -56,10 +96,11 @@ export default function AllLibrariesPage() {
       library.libraryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       library.address.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Max fee filter
+    // Max fee filter - now using the "Any Time" plan's hourly rate
+    const basicPlanHourlyRate = getBasicPlanHourlyRate(library);
     const matchesFee = 
       !filters.maxFee || 
-      library.feePerHour <= parseFloat(filters.maxFee);
+      basicPlanHourlyRate <= parseFloat(filters.maxFee);
     
     // Facility filter
     const matchesFacility = 
@@ -186,65 +227,70 @@ export default function AllLibrariesPage() {
           
           {!loading && !error && filteredLibraries.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredLibraries.map((library) => (
-                <Card key={library.id} className="overflow-hidden transition-all duration-300 hover:shadow-xl border-0 rounded-xl h-full flex flex-col">
-                  <div className="relative h-48 w-full group">
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
-                    <img
-                      src={library.photos[0] || "/globe.svg"}
-                      alt={library.libraryName}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  
-                  <CardContent className="p-5 flex-grow">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="font-bold text-lg text-gray-800">{library.libraryName}</h3>
-                      <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-full">
-                        <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mr-1" />
-                        <span className="text-sm font-semibold text-yellow-700">
-                          ₹{library.feePerHour}/hr
-                        </span>
+              {filteredLibraries.map((library) => {
+                // Calculate the hourly rate for display
+                const hourlyRate = getBasicPlanHourlyRate(library);
+                
+                return (
+                  <Card key={library.id} className="overflow-hidden transition-all duration-300 hover:shadow-xl border-0 rounded-xl h-full flex flex-col">
+                    <div className="relative h-48 w-full group">
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                      <img
+                        src={library.photos[0] || "/globe.svg"}
+                        alt={library.libraryName}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    
+                    <CardContent className="p-5 flex-grow">
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="font-bold text-lg text-gray-800">{library.libraryName}</h3>
+                        <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-full">
+                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mr-1" />
+                          <span className="text-sm font-semibold text-yellow-700">
+                            ₹{hourlyRate.toFixed(2)}/hr
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                      
+                      <div className="flex items-center text-gray-500 mb-4">
+                        <MapPin className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                        <span className="text-sm truncate">{library.address}</span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {library.facilities?.slice(0, 3).map((service, index) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="bg-gray-50 text-gray-700 border-gray-200 px-2 py-0.5 text-xs"
+                          >
+                            {service}
+                          </Badge>
+                        ))}
+                        {library.facilities?.length > 3 && (
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-50 text-gray-700 border-gray-200 px-2 py-0.5 text-xs"
+                          >
+                            +{library.facilities.length - 3} more
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
                     
-                    <div className="flex items-center text-gray-500 mb-4">
-                      <MapPin className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-                      <span className="text-sm truncate">{library.address}</span>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {library.facilities?.slice(0, 3).map((service, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="bg-gray-50 text-gray-700 border-gray-200 px-2 py-0.5 text-xs"
-                        >
-                          {service}
-                        </Badge>
-                      ))}
-                      {library.facilities?.length > 3 && (
-                        <Badge
-                          variant="outline"
-                          className="bg-gray-50 text-gray-700 border-gray-200 px-2 py-0.5 text-xs"
-                        >
-                          +{library.facilities.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter className="bg-gray-50 p-4 border-t border-gray-100">
-                    <Link
-                      href={`/libraries/${library.id}`}
-                      className="w-full flex items-center justify-center bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg transition-colors font-medium"
-                    >
-                      View Details
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </CardFooter>
-                </Card>
-              ))}
+                    <CardFooter className="bg-gray-50 p-4 border-t border-gray-100">
+                      <Link
+                        href={`/libraries/${library.id}`}
+                        className="w-full flex items-center justify-center bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg transition-colors font-medium"
+                      >
+                        View Details
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           )}
           

@@ -42,6 +42,21 @@ model Admin {
   createdAt DateTime @default(now())
 }
 
+model LibraryPlan {
+  id          String  @id @default(uuid())
+  hours       String
+  monthlyFee  String
+  planType    String
+  description String?
+  
+  // Relation to library
+  libraryId   String
+  library     Library @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  
+  @@index([libraryId])
+}
+
+
 model Library {
   id            String  @id @default(uuid())
   libraryName   String
@@ -58,8 +73,7 @@ model Library {
 
   // New fields
   whatsappNumber String? // Optional WhatsApp contact number
-  feePerHour     Float // Fee for hours per day
-  feePerMonth    Float // Fee per month
+  plans         LibraryPlan[] // Relation to plans
 
   facilities    String[]
   review_status String @default("approved") // Track if the library is reviewed

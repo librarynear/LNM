@@ -70,7 +70,7 @@ export default function LibraryDetailsPage() {
   const [plans, setPlans] = useState([
     // Basic Plan (first default plan)
     {
-      id: '1',
+      id: uuidv4(),
       hours: '6',
       monthlyFee: '600',
       planType: 'Any Time',
@@ -78,7 +78,7 @@ export default function LibraryDetailsPage() {
     },
     // Seat Allotment Plan (second default plan)
     {
-      id: '2',
+      id: uuidv4(),
       hours: '24',
       monthlyFee: '1200',
       planType: 'Fixed Seat',

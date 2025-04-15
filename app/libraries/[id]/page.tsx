@@ -5,24 +5,19 @@ import { ChevronLeft, MapPin, Clock, Star, Bookmark, Share2 } from "lucide-react
 
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/utils/supabase/server"
-// import { Library } from "@prisma/client"
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { Badge } from "@/components/ui/badge"
-// import LibraryReviews from "@/components/library-reviews"
-// import LibraryServices from "@/components/library-services"
-// import LibraryGallery from "@/components/library-gallery"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { LibraryPlan } from "@prisma/client"
 
 // This would normally come from a database or API
-
-
 const getLibraryData = async(id: string) => {
   try {
     const supabase = await createClient()
     const { data: libraryData, error: libraryError } = await supabase
       .from("Library")
-      .select("*")
+      .select("*, LibraryPlan(*)")
       .eq("id", id)
       .single()
+    
     if (libraryError) {
       console.error("Error fetching library data:", libraryError)
       return null
@@ -32,43 +27,6 @@ const getLibraryData = async(id: string) => {
       return null
     }
     return libraryData
-    // return {
-    //   id,
-    //   name: "Central Public Library",
-    //   description:
-    //     "The Central Public Library is a state-of-the-art facility offering a wide range of resources and services to the community. With spacious reading areas, modern technology, and an extensive collection of books and digital media, it serves as a hub for learning and community engagement.",
-    //   location: "123 Main Street, New York, NY 10001",
-    //   hours: {
-    //     monday: "9:00 AM - 8:00 PM",
-    //     tuesday: "9:00 AM - 8:00 PM",
-    //     wednesday: "9:00 AM - 8:00 PM",
-    //     thursday: "9:00 AM - 8:00 PM",
-    //     friday: "9:00 AM - 6:00 PM",
-    //     saturday: "10:00 AM - 5:00 PM",
-    //     sunday: "12:00 PM - 5:00 PM",
-    //   },
-    //   rating: 4.8,
-    //   reviewCount: 124,
-    //   mainImage: "/placeholder.svg?height=600&width=1200",
-    //   gallery: [
-    //     "/placeholder.svg?height=400&width=600",
-    //     "/placeholder.svg?height=400&width=600",
-    //     "/placeholder.svg?height=400&width=600",
-    //     "/placeholder.svg?height=400&width=600",
-    //   ],
-    //   services: [
-    //     {
-    //       name: "Research Support",
-    //       description: "Professional assistance with research projects and academic inquiries",
-    //     },
-    //     { name: "Children's Programs", description: "Educational and entertaining programs for children of all ages" },
-    //     { name: "Digital Resources", description: "Access to e-books, online databases, and digital archives" },
-    //     { name: "Study Rooms", description: "Private and group study spaces available for reservation" },
-    //     { name: "Computer Access", description: "Free computer and internet access for all patrons" },
-    //     { name: "Printing Services", description: "Black and white and color printing available at affordable rates" },
-    //   ],
-    //   amenities: ["Free Wi-Fi", "Wheelchair Accessible", "Parking", "Café", "Restrooms", "Meeting Rooms"],
-    // }
   } catch (error) {
     console.error("Error in getLibraryData:", error)
     return null
@@ -142,11 +100,100 @@ export default async function LibraryPage(props: { params: Promise<Params> }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
+            {/* Library Plans Table */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">Available Plans</h2>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Plan Type</TableHead>
+                      <TableHead>Hours</TableHead>
+                      <TableHead>Monthly Fee</TableHead>
+                      <TableHead>Description</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {library.LibraryPlan && library.LibraryPlan.length > 0 ? (
+                      library.LibraryPlan.map((plan:LibraryPlan) => (
+                        <TableRow key={plan.id}>
+                          <TableCell className="font-medium">{plan.planType}</TableCell>
+                          <TableCell>{plan.hours}</TableCell>
+                          <TableCell>{plan.monthlyFee}</TableCell>
+                          <TableCell>{plan.description || "—"}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">
+                          No plans available for this library
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+
+            {/* Facilities Table */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">Facilities</h2>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Available Facilities</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {library.facilities && library.facilities.length > 0 ? (
+                      library.facilities.map((facility:string, index:number) => (
+                        <TableRow key={index}>
+                          <TableCell>{facility}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell className="text-center py-4 text-muted-foreground">
+                          No facilities information available
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
             
-
-              
-
-              
+            {/* Additional Library Information */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">Library Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">Total Seats</h3>
+                  <p>{library.totalSeats || "Not specified"}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">Contact</h3>
+                  <p>{library.whatsappNumber || "Not available"}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">Location</h3>
+                  <p>{library.city}, {library.state} - {library.pincode}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">Map</h3>
+                  {library.googleMapLink ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={library.googleMapLink} target="_blank" rel="noopener noreferrer">
+                        View on Google Maps
+                      </a>
+                    </Button>
+                  ) : (
+                    <p>Map link not available</p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Sidebar */}

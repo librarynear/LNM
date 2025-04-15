@@ -44,7 +44,7 @@ export default function AboutPage() {
               </div>
               <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-xl">
                 <Image
-                  src="/placeholder.svg"
+                  src="/library_interior.jpg"
                   alt="Library interior with bookshelves"
                   layout="fill"
                   objectFit="cover"
@@ -106,16 +106,6 @@ export default function AboutPage() {
                 </CardContent>
               </Card>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Team */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold">Meet Our Team</h2>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* <TeamMember /> components commented out */}
           </div>
         </div>
       </section>

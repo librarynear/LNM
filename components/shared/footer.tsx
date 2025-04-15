@@ -58,15 +58,15 @@ export default function Footer() {
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <Icons.mapPin className="h-5 w-5 mt-0.5 text-slate-400" />
-                <span>123 Library Avenue, Knowledge District, Booktown, BK 10101</span>
+                <span>house no . 419 gali no.3 mandawali delhi - 110092 </span>
               </li>
               <li className="flex items-center gap-2">
                 <Icons.mail className="h-5 w-5 text-slate-400" />
-                <a href="mailto:contact@libraryapp.com" className="hover:text-amber-400 transition-colors">contact@libraryapp.com</a>
+                <a href="mailto:contact@libraryapp.com" className="hover:text-amber-400 transition-colors">contact librarynear@gmail.com</a>
               </li>
               <li className="flex items-center gap-2">
                 <Icons.phone className="h-5 w-5 text-slate-400" />
-                <a href="tel:+11234567890" className="hover:text-amber-400 transition-colors">+1 (123) 456-7890</a>
+                <a href="tel:+11234567890" className="hover:text-amber-400 transition-colors">+91 9354610893</a>
               </li>
             </ul>
           </div>

@@ -232,7 +232,7 @@ export default function FeaturedLibraries() {
                         </div>
                         
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {library.facilities?.slice(0, 3).map((service, index) => (
+                          {library.facilities?.slice(0, 2).map((service, index) => (
                             <Badge
                               key={index}
                               variant="outline"
@@ -241,12 +241,12 @@ export default function FeaturedLibraries() {
                               {service}
                             </Badge>
                           ))}
-                          {library.facilities?.length > 3 && (
+                          {library.facilities?.length > 2 && (
                             <Badge
                               variant="outline"
                               className="bg-gray-50 text-gray-700 border-gray-200 px-3 py-1"
                             >
-                              +{library.facilities.length - 3} more
+                              +{library.facilities.length - 2} more
                             </Badge>
                           )}
                         </div>

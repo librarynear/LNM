@@ -40,6 +40,18 @@ export default function AllLibrariesPage() {
     facility: "",
   });
   
+  // Get search query from URL parameter in a client-safe way
+  useEffect(() => {
+    // Access URL search parameters from the window object (client-side only)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchQuery = urlParams.get("search");
+      if (searchQuery) {
+        setSearchTerm(searchQuery);
+      }
+    }
+  }, []);
+  
   useEffect(() => {
     const fetchAllLibraries = async () => {
       setLoading(true);

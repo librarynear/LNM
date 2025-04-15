@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { v4 as uuidV4 } from 'uuid';
+
 // Define type for individual plan
 export interface LibraryPlan {
   id: string;
@@ -136,7 +137,14 @@ const LibraryPlansManager: React.FC<LibraryPlansManagerProps> = ({ plans, setPla
                   className="w-full"
                   value={plan.description}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePlan(plan.id, 'description', e.target.value)}
+                  disabled={index < 2} // Disable description field for the first two plans
+                  title={index < 2 ? "Description cannot be modified for default plans" : ""}
                 />
+                {index < 2 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Default plan description cannot be modified
+                  </p>
+                )}
               </div>
             </div>
           </div>

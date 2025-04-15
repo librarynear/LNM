@@ -6,7 +6,7 @@ import { ChevronLeft, MapPin, Clock, Star, Bookmark, Share2 } from "lucide-react
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/utils/supabase/server"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import } from "@prisma/client"
+import { LibraryPlan } from "@prisma/client"
 
 // This would normally come from a database or API
 const getLibraryData = async(id: string) => {

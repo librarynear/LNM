@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/utils/supabase/server"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LibraryPlan } from "@/src/types"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 
 // This would normally come from a database or API
@@ -52,9 +59,14 @@ export default async function LibraryPage(props: { params: Promise<Params> }) {
     );
   }
 
+  // Default placeholder photos array if no photos available
+  const photos = library.photos && library.photos.length > 0 
+    ? library.photos 
+    : ["/placeholder.svg"];
+
   return (
     <main className="min-h-screen pb-16">
-      {/* Hero Image */}
+      {/* Hero Image - Keep as is */}
       <div className="relative h-[400px] w-full">
         <Image
           src={library.photos && library.photos.length > 0 ? library.photos[0] : "/placeholder.svg"}
@@ -245,6 +257,55 @@ export default async function LibraryPage(props: { params: Promise<Params> }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Photo Gallery Section - Full Width */}
+      <div className="w-full bg-gray-50 py-12 border-t border-gray-200">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center">Library Photo Gallery</h2>
+        </div>
+        
+        {photos.length > 1 ? (
+          <div className="w-full px-4 sm:px-8 lg:px-16">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {photos.map((photo:string, index:number) => (
+                  <CarouselItem key={index} className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+                    <div className="p-2">
+                      <div className="overflow-hidden rounded-xl border border-gray-200 shadow bg-white">
+                        <div className="aspect-square relative">
+                          <Image 
+                            src={photo} 
+                            alt={`${library.libraryName || "Library"} photo ${index + 1}`}
+                            fill
+                            className="object-cover transition-all duration-300 hover:scale-105"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-1 sm:left-4" />
+              <CarouselNext className="right-1 sm:right-4" />
+            </Carousel>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <div className="max-w-lg w-full px-4">
+              <div className="overflow-hidden rounded-xl border border-gray-200 shadow bg-white">
+                <div className="aspect-video relative">
+                  <Image 
+                    src={photos[0]} 
+                    alt={`${library.libraryName || "Library"} photo`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   )

@@ -41,15 +41,15 @@ export default function Header() {
   }
 
   return (
-    <header className="border-b fixed top-0 w-full backdrop-blur-md bg-white/95 z-50 shadow-sm px-4">
+    <header className="border-b fixed top-0 w-full backdrop-blur-md bg-white/95 z-50 shadow-sm px-4 py-2">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <div className="relative">
             <Image
               src="/logo.png"
               alt="LibraryNear.com Logo"
-              width={50}
-              height={50}
+              width={60}
+              height={60}
               className="object-contain h-full"
               priority
             />

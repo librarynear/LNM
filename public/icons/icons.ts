@@ -6,7 +6,8 @@ import {
     MapPin,
     Mail,
     Phone,
-    MessageSquare
+    MessageSquare,
+    Twitter
   } from "lucide-react";
   
   export const Icons = {
@@ -17,5 +18,6 @@ import {
     mapPin: MapPin,
     mail: Mail,
     phone: Phone,
+    twitter : Twitter
   };
   
